@@ -17,6 +17,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+DEFAULT_COMMANDS = [
+    "sudo apt update -y",
+    "sudo apt upgrade -y",
+    "sudo apt install -y git",
+    "sudo apt install -y docker.io",
+    "sudo apt install -y screen",
+    "sudo apt install -y nano",
+    "sudo apt install -y lsof",
+    "sudo apt install -y ca-certificates cmake zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev curl git wget make jq build-essential pkg-config openssl lsb-release libssl-dev libreadline-dev libffi-dev gcc screen unzip lz4 lsof nano",
+    "sudo apt autoremove -y",
+    "sudo apt autoclean -y"
+]
 
 def parse_credential(line: str) -> Dict[str, Any]:
     line = line.strip()
@@ -39,7 +51,6 @@ def parse_credential(line: str) -> Dict[str, Any]:
         'host': host,
         'port': port
     }
-
 
 async def execute_commands(
     conn: asyncssh.SSHClientConnection, 
@@ -208,7 +219,6 @@ async def process_server(
                     result['error'] = str(e)
         return result
 
-
 async def main(args):
     servers = []
     try:
@@ -232,16 +242,7 @@ async def main(args):
             logger.error(f"Error reading commands file: {e}")
             return
     else:
-        commands = [
-            "sudo apt update -y",
-            "sudo apt upgrade -y",
-            "sudo apt install -y git",
-            "sudo apt install -y docker.io",
-            "sudo apt install -y screen",
-            "sudo apt install -y nano",
-            "sudo apt autoremove -y",
-            "sudo apt autoclean -y"
-        ]
+        commands = DEFAULT_COMMANDS
 
     upload_file = args.upload_file
     if upload_file and not os.path.isfile(upload_file):
@@ -279,7 +280,6 @@ async def main(args):
             
     logger.info(f"Processing complete. Success: {successful}/{len(servers)}")
     logger.info("Detailed report saved to report.json")
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
